@@ -1,3 +1,4 @@
+
 const fs = require('fs');
 const axios = require('axios');
 
@@ -7,33 +8,34 @@ async function readURL(path) {
             console.error(`Error reading URL: ${path}`, err);
             process.exit(1);
         }
-    
-        else {
-            for (url of data.split('\n')) {
-                try {
-                    const res = await axios.get(url);
-                    console.log(`Wrote to ${res}`);
-                    return res;
-                }
-                catch(err) {
-                    console.error(`Couldn't download: ${res}`);
-                }
-                makeFile(res);
-            }
-        }
+        return separateUrls(data)
     });
 }
 
+function separateUrls(data){
+    let urls = data.split('\n').filter(u => u !== (''));
+    for(url of urls){
+        getHTML(url)
+    }
+}
 
-async function makeFile(res) {
-    let noHTTP = res.map(res => res.split("//")[1]);
-    let hostName = noHTTP.map(noHTTP => noHTTP.split("/")[0]);
-    fs.writeFile(`${hostName}.txt`, res.value.data, (err) => {
+async function getHTML(url) {
+    let resp;
+    try {
+       resp = await axios.get(url);
+    }
+    catch  {
+        console.error(`Couldn't Download ${url}`);
+    }
+    let fileName = new URL(url).hostname;
+    
+    fs.writeFile(fileName, resp.data, 'utf8', function(err) {
         if (err) {
             console.error(err);
+            process.exit(1);
         }
-        console.log(`File created for ${hostName}`);
-    });
+        console.log(`File created for ${fileName}`);
+        }); 
 }
 
 let path = process.argv[2];
