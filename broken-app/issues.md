@@ -1,11 +1,6 @@
 # Broken App Issues
-
-The routing function does not
-
-No json packages installed.
-
-Let/var used to install express, axios.
-
-Reconfigured axios logic
-
-Added functionality to event listener
+Never declared app.use for json
+Bad variable declaration
+No npm packages installed
+No route for next
+No handling promises
